@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fan Syntax B1 | App</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: { bgBase: '#050B14', panelDark: '#0A152A', panelHover: '#13284A', textMain: '#F8FAFC', textMuted: '#64748B', accentNeon: '#00F0FF', accentGreen: '#39FF14', accentRed: '#FF003C' },
+                    fontFamily: { epic: ['"Rajdhani"', 'sans-serif'], ui: ['"Inter"', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background-color: #000; display: flex; justify-content: center; color: #F8FAFC; }
+        #app-container { width: 100%; max-width: 430px; height: 100vh; background-color: #050B14; position: relative; overflow: hidden; border-left: 1px solid #13284A; border-right: 1px solid #13284A; display: flex; flex-direction: column; }
+        .glass { background: rgba(5, 11, 20, 0.95); backdrop-filter: blur(10px); }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-10px); } 75% { transform: translateX(10px); } }
+        .shake { animation: shake 0.4s; }
+        .btn-hud { background: linear-gradient(135deg, rgba(0, 240, 255, 0.1), rgba(0, 240, 255, 0.05)); color: #00F0FF; border: 1px solid #00F0FF; font-family: 'Rajdhani', sans-serif; text-transform: uppercase; font-weight: 700; letter-spacing: 0.1em; transition: all 0.3s; }
+        .btn-hud:hover { background: #00F0FF; color: #050B14; box-shadow: 0 0 20px rgba(0, 240, 255, 0.4); }
+        .stat-glow { text-shadow: 0 0 10px currentColor; }
+    </style>
+</head>
+<body>
+
+    <div id="app-container">
+        <!-- Header -->
+        <header class="glass p-5 border-b border-[#13284A] flex justify-between items-center z-10 shrink-0">
+            <div>
+                <h1 class="font-epic text-2xl text-accentNeon tracking-widest uppercase stat-glow">SYNTAX_DB B1</h1>
+                <p class="font-ui text-[9px] text-textMuted font-bold uppercase mt-1 tracking-widest">Analytics Validation</p>
+            </div>
+            <div class="text-right">
+                <span id="q-counter" class="font-epic text-xl text-textMain">01 / 15</span>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="flex-1 overflow-y-auto p-6 flex flex-col justify-center relative">
+            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-10 pointer-events-none">
+                <i class="fa-solid fa-server text-[15rem] text-accentNeon"></i>
+            </div>
+            
+            <div id="question-card" class="relative z-10 w-full transition-opacity duration-300 bg-panelDark border border-[#13284A] p-8 rounded shadow-2xl">
+                <p class="font-ui text-textMuted font-bold text-[10px] mb-6 uppercase tracking-widest border-b border-[#13284A] pb-2 inline-block">Process Data String</p>
+                <h2 id="q-text" class="font-ui text-xl font-bold leading-relaxed mb-10 text-textMain">They <span id="blank" class="border-b border-dashed border-textMuted text-transparent px-4 mx-1">___</span> lose the game today.</h2>
+                
+                <div id="options-container" class="flex flex-col gap-4 font-epic text-2xl">
+                    <!-- Buttons injected via JS -->
+                </div>
+            </div>
+
+            <!-- Result Screen -->
+            <div id="result-screen" class="hidden absolute inset-0 bg-[#050B14] z-20 flex flex-col items-center justify-center p-8 text-center">
+                <div class="w-32 h-32 rounded-full border border-accentNeon flex items-center justify-center mb-6 shadow-[0_0_30px_rgba(0,240,255,0.2)]">
+                    <i class="fa-solid fa-check-double text-5xl text-accentNeon stat-glow"></i>
+                </div>
+                <h2 class="font-epic text-4xl mb-4 text-textMain tracking-widest uppercase">DATA PROCESSED</h2>
+                <p class="font-ui text-textMuted font-bold mb-10 text-xs uppercase tracking-widest">Final Accuracy Rating</p>
+                <div class="text-7xl font-epic text-accentNeon mb-12 stat-glow" id="final-score">100%</div>
+                <button onclick="location.reload()" class="w-full btn-hud py-4 rounded">REBOOT SYSTEM</button>
+            </div>
+        </main>
+        
+        <!-- Progress -->
+        <div class="h-1 w-full bg-[#13284A] shrink-0">
+            <div id="progress-bar" class="h-full bg-accentNeon transition-all duration-300 shadow-[0_0_10px_rgba(0,240,255,0.8)]" style="width: 6.66%"></div>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            { q: "Brazil [BLANK] win the World Cup, but it is not 100% certain.", opts: ["will", "might", "must"], ans: "might" },
+            { q: "If they build the stadium, they [BLANK] lose money.", opts: ["will", "would", "are"], ans: "will" },
+            { q: "The team is playing terribly. They [BLANK] be very tired.", opts: ["might", "must", "can't"], ans: "must" },
+            { q: "If he [BLANK] well, the coach will start him in the final.", opts: ["play", "plays", "will play"], ans: "plays" },
+            { q: "Building new [BLANK] costs billions of dollars.", opts: ["legacy", "infrastructure", "revenue"], ans: "infrastructure" },
+            { q: "They [BLANK] win the match; the other team is much stronger.", opts: ["must", "might not", "will definitely"], ans: "might not" },
+            { q: "If we don't buy tickets now, they [BLANK] sell out.", opts: ["would", "will", "might to"], ans: "will" },
+            { q: "An [BLANK] is a team that nobody expects to win.", opts: ["infrastructure", "underdog", "favorite"], ans: "underdog" },
+            { q: "You [BLANK] be joking! That ticket costs $2,000!", opts: ["can", "might", "must"], ans: "must" },
+            { q: "What [BLANK] happen if it rains during the match?", opts: ["does", "will", "might to"], ans: "will" },
+            { q: "The country hopes to generate a lot of [BLANK] from tourism.", opts: ["revenue", "legacy", "underdogs"], ans: "revenue" },
+            { q: "I'm not sure where the final is. It [BLANK] be in New York.", opts: ["could", "must", "will"], ans: "could" },
+            { q: "If Brazil [BLANK], the fans will celebrate for a week.", opts: ["wins", "win", "will win"], ans: "wins" },
+            { q: "They have won all their games easily. They [BLANK] be a great team.", opts: ["might", "must", "could"], ans: "must" },
+            { q: "We [BLANK] go to the stadium if the tickets are cheap.", opts: ["might", "must", "can't"], ans: "might" }
+        ];
+
+        let current = 0; let score = 15;
+
+        const qText = document.getElementById('q-text');
+        const optionsContainer = document.getElementById('options-container');
+        const qCounter = document.getElementById('q-counter');
+        const progressBar = document.getElementById('progress-bar');
+        const card = document.getElementById('question-card');
+
+        function loadQuestion() {
+            const data = questions[current];
+            const parts = data.q.split("[BLANK]");
+            qText.innerHTML = `${parts[0]}<span id="blank" class="border-b border-dashed border-textMuted text-transparent px-4 mx-1">___</span>${parts[1]}`;
+            
+            optionsContainer.innerHTML = '';
+            data.opts.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = "w-full bg-transparent border border-[#13284A] text-textMuted p-4 rounded text-left hover:border-accentNeon hover:text-accentNeon uppercase tracking-widest transition-colors";
+                btn.innerText = opt;
+                btn.onclick = () => checkAnswer(opt, data.ans, btn);
+                optionsContainer.appendChild(btn);
+            });
+            
+            qCounter.innerText = `${String(current + 1).padStart(2, '0')} / 15`;
+            progressBar.style.width = `${((current + 1) / 15) * 100}%`;
+        }
+
+        function checkAnswer(selected, correct, btn) {
+            const blank = document.getElementById('blank');
+            Array.from(optionsContainer.children).forEach(b => b.disabled = true);
+            
+            blank.innerText = selected;
+            blank.classList.remove('text-transparent', 'border-dashed', 'border-textMuted');
+
+            if(selected === correct) {
+                blank.className = "text-accentGreen font-bold px-2 mx-1 rounded border-b border-accentGreen";
+                btn.classList.replace('border-[#13284A]', 'border-accentGreen');
+                btn.classList.replace('text-textMuted', 'text-accentGreen');
+                setTimeout(() => nextQuestion(), 800);
+            } else {
+                score--;
+                blank.className = "text-accentRed font-bold px-2 mx-1 rounded border-b border-accentRed";
+                btn.classList.replace('border-[#13284A]', 'border-accentRed');
+                btn.classList.replace('text-textMuted', 'text-accentRed');
+                card.classList.add('shake');
+                setTimeout(() => card.classList.remove('shake'), 400);
+                setTimeout(() => nextQuestion(), 1200);
+            }
+        }
+
+        function nextQuestion() {
+            card.style.opacity = 0;
+            setTimeout(() => {
+                current++;
+                if(current < 15) {
+                    loadQuestion();
+                    card.style.opacity = 1;
+                } else {
+                    showResult();
+                }
+            }, 300);
+        }
+
+        function showResult() {
+            document.getElementById('result-screen').classList.remove('hidden');
+            const percent = Math.max(0, Math.round((score / 15) * 100));
+            document.getElementById('final-score').innerText = `${percent}%`;
+            if(percent < 70) {
+                document.getElementById('final-score').classList.replace('text-accentNeon', 'text-accentRed');
+                document.querySelector('.fa-check-double').classList.replace('fa-check-double', 'fa-triangle-exclamation');
+                document.querySelector('.fa-triangle-exclamation').parentElement.classList.replace('border-accentNeon', 'border-accentRed');
+                document.querySelector('.fa-triangle-exclamation').parentElement.classList.replace('shadow-[0_0_30px_rgba(0,240,255,0.2)]', 'shadow-[0_0_30px_rgba(255,0,60,0.2)]');
+                document.querySelector('.fa-triangle-exclamation').classList.replace('text-accentNeon', 'text-accentRed');
+            }
+        }
+
+        window.onload = loadQuestion;
+    </script>
+</body>
+</html>
